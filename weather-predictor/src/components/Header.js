@@ -4,7 +4,7 @@ import React from "react";
 function Header() {
   return (
     <header style={styles.header}>
-      <h1>Weather Predictor</h1>
+      <h1>100% Correct Weather Predictor App</h1>
     </header>
   );
 }

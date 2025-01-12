@@ -1,41 +1,82 @@
 import React, { useState, useEffect } from "react";
 
+// 1. Local array of valid locations (can be as large as you want).
+const locationList = [
+"Vajarahalli, Bengaluru, Karnataka, India",
+"Thalaghattapura, Bengaluru, Karnataka, India",
+"Lakshmipura, Bengaluru, Karnataka, India",
+"Udipalya, Bengaluru, Karnataka, India"
+];
+
 function Main() {
-  // Track the user’s location input
-  const [location, setLocation] = useState("");
+  // 2. States for autocomplete
+  const [inputValue, setInputValue] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState(""); 
+    // If we only want the button enabled after a valid pick
 
-  // Track loading state (for showing the loading popup)
+  // 3. Loading popup states
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState("Predicting...");
 
-  // Track when to show the final "idk" popup
+  // 4. Final popup state
   const [showResult, setShowResult] = useState(false);
 
-  // Handle the "Predict" button click
+  // 5. Handle user typing in the input
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setInputValue(value);
+    setSelectedLocation(""); // Reset selected location if user starts typing again
+
+    // Basic startsWith filtering
+    if (value.trim().length > 0) {
+      const filtered = locationList.filter((loc) =>
+        loc.toLowerCase().startsWith(value.toLowerCase())
+      );
+      setSuggestions(filtered);
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  // 6. When user clicks on a suggestion, finalize the location
+  const handleSelectSuggestion = (loc) => {
+    setInputValue(loc);
+    setSelectedLocation(loc); 
+    setSuggestions([]); 
+  };
+
+  // 7. Handle "Predict" button
   const handlePredict = () => {
-    // Reset states each time Predict is clicked
+    // Reset everything
     setIsLoading(true);
+    setLoadingText("Predicting...");
     setShowResult(false);
 
-    // Simulate a 5-second loading process
+    // After 5s, change the text in the same loading popup
+    setTimeout(() => {
+      setLoadingText("Predicting it real deep and hard...");
+    }, 5000);
+
+    // After 10s total, hide loading popup -> show final popup
     setTimeout(() => {
       setIsLoading(false);
       setShowResult(true);
-    }, 5000);
+    }, 10000);
   };
 
-  // OPTIONAL: Automatically close the final popup after 5 seconds
+  // 8. Automatically close the final popup after 15 seconds
   useEffect(() => {
-    let resultTimer;
+    let timer;
     if (showResult) {
-      resultTimer = setTimeout(() => {
+      timer = setTimeout(() => {
         setShowResult(false);
-      }, 5000);
+      }, 15000);
     }
-    // Cleanup timer if the component unmounts or showResult changes
-    return () => clearTimeout(resultTimer);
+    return () => clearTimeout(timer);
   }, [showResult]);
 
-  // Close the final popup immediately (when user presses the "OK" button)
+  // 9. Close final popup immediately when user clicks "OK"
   const handleClosePopup = () => {
     setShowResult(false);
   };
@@ -44,16 +85,39 @@ function Main() {
     <main style={styles.main}>
       <h2>Weather Predictor</h2>
 
-      {/* Location input and Predict button */}
+      {/* Autocomplete Input + Predict Button */}
       <div style={styles.formContainer}>
-        <input
-          type="text"
-          placeholder="Enter your location"
-          style={styles.input}
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-        />
-        <button style={styles.button} onClick={handlePredict}>
+        <div style={{ position: "relative", flex: 1 }}>
+          <input
+            type="text"
+            placeholder="Enter your location"
+            style={styles.input}
+            value={inputValue}
+            onChange={handleInputChange}
+          />
+
+          {/* Suggestions */}
+          {suggestions.length > 0 && (
+            <div style={styles.suggestionsContainer}>
+              {suggestions.map((loc, index) => (
+                <div
+                  key={index}
+                  style={styles.suggestionItem}
+                  onClick={() => handleSelectSuggestion(loc)}
+                >
+                  {loc}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Disable Predict until user has selected a valid location */}
+        <button
+          style={styles.button}
+          onClick={handlePredict}
+          disabled={!selectedLocation}
+        >
           Predict
         </button>
       </div>
@@ -62,8 +126,8 @@ function Main() {
       {isLoading && (
         <div style={styles.popupOverlay}>
           <div style={styles.popup}>
-            <p>Predicting...</p>
-            <p>*Insert Scanning Bar...*</p>
+            <p>{loadingText}</p>
+            <p>*Insert Scanning Bar*</p>
           </div>
         </div>
       )}
@@ -72,9 +136,9 @@ function Main() {
       {showResult && (
         <div style={styles.popupOverlay}>
           <div style={styles.popup}>
-            <p>IDK! go just look outside</p>
+            <p>IDK! Go Just Look Outside.</p>
             <button style={styles.button} onClick={handleClosePopup}>
-              OK
+              Okie
             </button>
           </div>
         </div>
@@ -83,6 +147,7 @@ function Main() {
   );
 }
 
+// 10. Basic inline styles
 const styles = {
   main: {
     backgroundColor: "#ffe0b2",
@@ -96,7 +161,7 @@ const styles = {
     marginBottom: "20px",
   },
   input: {
-    flex: 1,
+    width: "100%",
     padding: "8px",
     fontSize: "16px",
     borderRadius: "4px",
@@ -109,6 +174,23 @@ const styles = {
     border: "none",
     backgroundColor: "#f44336",
     color: "#fff",
+    cursor: "pointer",
+  },
+  suggestionsContainer: {
+    position: "absolute",
+    top: "36px", 
+    left: 0,
+    width: "100%",
+    backgroundColor: "#fff",
+    border: "1px solid #ccc",
+    zIndex: 999,
+    borderRadius: "4px",
+    maxHeight: "150px",
+    overflowY: "auto",
+  },
+  suggestionItem: {
+    padding: "8px",
+    borderBottom: "1px solid #eee",
     cursor: "pointer",
   },
   popupOverlay: {
