@@ -1,0 +1,23 @@
+/* App.css */
+
+/* Reset default margins/padding and set the height to 100% */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* Parent container: flex column that stretches to full view height */
+.App {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: sans-serif;
+  background-color: #f4f4f4;
+}
+
+/* Main area grows to fill extra space, pushing footer to the bottom */
+main {
+  flex: 1;
+}
