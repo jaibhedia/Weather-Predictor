@@ -1,23 +1,47 @@
 /* App.css */
 
-/* Reset default margins/padding and set the height to 100% */
-html, body {
+/* Reset default margins and set background + font */
+html,
+body {
   margin: 0;
   padding: 0;
-  height: 100%;
-  box-sizing: border-box;
+  background-color: #f5a623; /* Main orange background */
+  font-family: "Press Start 2P", monospace; /* Retro font */
+  color: #000; /* Black text */
 }
 
-/* Parent container: flex column that stretches to full view height */
+/* Make sure the container spans full height (if you want a sticky footer etc.) */
 .App {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  font-family: sans-serif;
-  background-color: #f4f4f4;
 }
 
-/* Main area grows to fill extra space, pushing footer to the bottom */
+/* Apply thick black borders to key sections */
+header,
+main,
+footer {
+  border: 4px solid #000; /* Thicker black border for a bold look */
+  margin: 20px;
+  padding: 20px;
+  border-radius: 6px; /* Subtle rounding, optional */
+  background-color: #ffd67c; /* Slightly lighter orange inside panels, optional */
+}
+
+/* Header Styles */
+header {
+  text-align: center;
+  font-size: 1.25rem;
+  text-transform: uppercase; /* Bold, uppercase look */
+}
+
+/* Main Styles */
 main {
-  flex: 1;
+  flex: 1; /* If you have a sticky footer layout, let main take up leftover space */
+}
+
+/* Footer Styles */
+footer {
+  text-align: center;
+  font-size: 1rem;
 }

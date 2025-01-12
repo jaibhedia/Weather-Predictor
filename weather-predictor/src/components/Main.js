@@ -1,18 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 function Main() {
-  // 1. State for the user’s location input
+  // Track the user’s location input
   const [location, setLocation] = useState("");
 
-  // 2. State to track loading (show/hide the loading popup)
+  // Track loading state (for showing the loading popup)
   const [isLoading, setIsLoading] = useState(false);
 
-  // 3. State to track when to show the final message
+  // Track when to show the final "idk" popup
   const [showResult, setShowResult] = useState(false);
 
-  // When the user clicks "Predict"
+  // Handle the "Predict" button click
   const handlePredict = () => {
-    // Reset states each time user clicks
+    // Reset states each time Predict is clicked
     setIsLoading(true);
     setShowResult(false);
 
@@ -21,6 +21,23 @@ function Main() {
       setIsLoading(false);
       setShowResult(true);
     }, 5000);
+  };
+
+  // OPTIONAL: Automatically close the final popup after 5 seconds
+  useEffect(() => {
+    let resultTimer;
+    if (showResult) {
+      resultTimer = setTimeout(() => {
+        setShowResult(false);
+      }, 5000);
+    }
+    // Cleanup timer if the component unmounts or showResult changes
+    return () => clearTimeout(resultTimer);
+  }, [showResult]);
+
+  // Close the final popup immediately (when user presses the "OK" button)
+  const handleClosePopup = () => {
+    setShowResult(false);
   };
 
   return (
@@ -46,16 +63,19 @@ function Main() {
         <div style={styles.popupOverlay}>
           <div style={styles.popup}>
             <p>Predicting...</p>
-            <p>*Insert Scanning bar...*</p>
+            <p>*Insert Scanning Bar...*</p>
           </div>
         </div>
       )}
 
-      {/* Result Popup */}
+      {/* Final "idk" Popup */}
       {showResult && (
         <div style={styles.popupOverlay}>
           <div style={styles.popup}>
             <p>IDK! go just look outside</p>
+            <button style={styles.button} onClick={handleClosePopup}>
+              OK
+            </button>
           </div>
         </div>
       )}
@@ -63,7 +83,6 @@ function Main() {
   );
 }
 
-// Inline styling for simplicity
 const styles = {
   main: {
     backgroundColor: "#ffe0b2",
@@ -93,7 +112,6 @@ const styles = {
     cursor: "pointer",
   },
   popupOverlay: {
-    // Full-screen overlay
     position: "fixed",
     top: 0,
     left: 0,
@@ -103,7 +121,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    zIndex: 999, // Make sure it stays on top
+    zIndex: 999,
   },
   popup: {
     backgroundColor: "#fff",
